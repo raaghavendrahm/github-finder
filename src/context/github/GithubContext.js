@@ -18,29 +18,6 @@ export const GithubProvider = ({ children }) => {
 
   const [state, dispatch] = useReducer(githubReducer, initialState);
 
-  // Search Users
-  const searchUsers = async (text) => {
-    setLoading();
-
-    // Create variable for url parameters for search to make URL look clean:
-    const params = new URLSearchParams({
-      q: text,
-    });
-
-    const response = await fetch(`${GITHUB_URL}/search/users?${params}`, {
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-      },
-    });
-
-    const { items } = await response.json(); // "data" is an object which has "items" object inside it that has users data. So, it is destructured as {items}, else it could be used as "data.items".
-
-    dispatch({
-      type: 'GET_USERS',
-      payload: items,
-    });
-  };
-
   // Get Single Users
   const getUser = async (login) => {
     setLoading();
@@ -100,11 +77,13 @@ export const GithubProvider = ({ children }) => {
   return (
     <GithubContext.Provider
       value={{
-        users: state.users,
+        ...state,
+        // Spread operator can replace the followin lines of code for state:
+        /* users: state.users,
         loading: state.loading,
         user: state.user,
-        repos: state.repos,
-        searchUsers,
+        repos: state.repos, */
+        dispatch,
         clearUsers,
         getUser,
         getUserRepos,
