@@ -1,5 +1,13 @@
+import axios from 'axios';
+// Using axios cleans the file nicely. However, it is optional.
+
 const GITHUB_URL = process.env.REACT_APP_GITHUB_URL;
 const GITHUB_TOKEN = process.env.REACT_APP_GITHUB_TOKEN;
+
+const github = axios.create({
+  baseURL: GITHUB_URL,
+  headers: { Authorization: `token ${GITHUB_TOKEN}` },
+});
 
 // Search Users
 export const searchUsers = async (text) => {
@@ -8,48 +16,20 @@ export const searchUsers = async (text) => {
     q: text,
   });
 
-  const response = await fetch(`${GITHUB_URL}/search/users?${params}`, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-    },
-  });
+  const response = await github.get(`/search/users?${params}`); // note that axios directly gives json data. So, need not do response.json() additionally as done with fetch API.
 
-  const { items } = await response.json(); // "data" is an object which has "items" object inside it that has users data. So, it is destructured as {items}, else it could be used as "data.items".
-
-  return items;
+  return response.data.items;
 };
 
-// Get Single User
-export const getUser = async (login) => {
-  const response = await fetch(`${GITHUB_URL}/users/${login}`, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-    },
-  });
+// With axios, getUser and getUserRepos functions are made one function:
 
-  // If login detail is invalid, show 404. Else, show the user profile:
-  if (response.status === 404) {
-    window.location = '/notfound';
-  } else {
-    const data = await response.json();
-    return data;
-  }
-};
+// Get user and repos:
+export const getUserAndRepos = async (login) => {
+  // As there are two different requests for getting user and getting repos, promise.all() is used and passed in array:
+  const [user, repos] = await Promise.all([
+    github.get(`/users/${login}`),
+    github.get(`/users/${login}/repos`),
+  ]);
 
-// Get user repos
-export const getUserRepos = async (login) => {
-  // Create variable for url parameters for getting latest 10 public repos to make URL look clean:
-  const params = new URLSearchParams({
-    sort: 'created',
-    per_page: 10,
-  });
-
-  const response = await fetch(`${GITHUB_URL}/users/${login}/repos?${params}`, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-    },
-  });
-
-  const data = await response.json();
-  return data;
+  return { user: user.data, repos: repos.data };
 };
