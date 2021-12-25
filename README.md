@@ -1,5 +1,8 @@
 [Click here](https://61c7117191a0cb956a5679da--dazzling-jackson-38badf.netlify.app/) for the live demo  of the website on [Netlify](https://www.netlify.com/).
 
+Project Credits: [Brad Traversy](https://github.com/bradtraversy)
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
