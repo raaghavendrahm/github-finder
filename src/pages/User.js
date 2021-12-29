@@ -23,8 +23,7 @@ const User = () => {
     };
 
     getUserData();
-    // eslint-disable-next-line
-  }, []);
+  }, [dispatch, params.login]);
 
   const {
     name,
